@@ -174,7 +174,7 @@ def _worker(remote, parent_remote, env_fn_wrapper):
                 remote.send(getattr(env, data))
             elif cmd == 'set_attr':
                 remote.send(setattr(env, data[0], data[1]))
-            elif cmd == 'update_macros:'
+            elif cmd == 'update_macros':
                 env.skills = data
                 remote.send('OK')
             else:
@@ -204,7 +204,7 @@ class MyDummyVecEnv(DummyVecEnv):
         for env in self.envs:
             env.skills = M
 
-class MyLinearSchedule(MyLinearSchedule):
+class MyLinearSchedule(LinearSchedule):
     def __init__(self, schedule_timesteps, final_p, initial_p=1.0):
         self.schedule_timesteps = schedule_timesteps
         self.final_p = final_p
@@ -274,6 +274,13 @@ class MyLinearSchedule(MyLinearSchedule):
     
 
 
+import stable_baselines as stb
+
+stb.common.vec_env.subproc_vec_env._worker = _worker
+stb.common.vec_env.DummyVecEnv = MyDummyVecEnv
+stb.common.vec_env.SubprocVecEnv = MySubprocVecEnv
+stb.common.schedules.LinearSchedule = MyLinearSchedule
+
 
 def Macro(algo, *args, macro_length=5, macro_num=None, **kwargs):
 
@@ -283,12 +290,7 @@ def Macro(algo, *args, macro_length=5, macro_num=None, **kwargs):
 
     # initialize stable baselines
     if not Macro.setup_stable_baselines:
-        import stable_baselines as stb
-
-        stb.common.vec_env.subproc_vec_env._worker = _worker
-        stb.common.vec_env.DummyVecEnv = MyDummyVecEnv
-        stb.common.vec_env.SubprocVecEnv = MySubprocVecEnv
-        stb.common.schedules.LinearSchedule = MyLinearSchedule
+        
 
         Macro.setup_stable_baselines = True
 

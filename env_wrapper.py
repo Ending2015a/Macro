@@ -269,7 +269,7 @@ class SkillWrapper(gym.Wrapper):
         
 
 
-env = FrameSkip(SkillWrapper())
+# env = FrameSkip(SkillWrapper())
 
 
 
